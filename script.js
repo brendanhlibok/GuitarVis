@@ -1,23 +1,57 @@
-const svg = document.getElementById("strings");
+const guitarStrings = 6;
+const frets = 12;
 
-const startX = 10;
-const endX = 190;
+const canvas = document.getElementById("fretboard");
+const ctx = canvas.getContext("2d");
 
-const strings = [
-    { y: 0, color: "blue" },
-    { y: 33, color: "red" },
-    { y: 66, color: "blue" },
-    { y: 99, color: "blue" },
-    { y: 132, color: "blue" },
-];
+updateFretboard(guitarStrings, frets, 10);
 
-for (const { y, color } of strings) {
-    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-    line.setAttribute("x1", startX);
-    line.setAttribute("y1", y);
-    line.setAttribute("x2", endX);
-    line.setAttribute("y2", y);
-    line.setAttribute("stroke", color);
-    line.setAttribute("stroke-width", "5");
-    svg.appendChild(line);
+function updateFretboard(numStrings, numFrets, margin){
+
+    let stringY = [margin];
+    let fretX = [margin];
+
+    for(let i=0; i < numStrings-1; i++){
+        div = (canvas.height-margin*2)/numStrings;
+        stringY.push(div+stringY[i]);
+    }
+    console.log(stringY);
+
+    for(let i=0; i < numFrets-1; i++){
+        div = (canvas.width-margin*2)/numFrets;
+        fretX.push(div+fretX[i]);
+    }
+    console.log(fretX);
+
+    // Display Strings
+    for(let i=0; i < numStrings; i++){
+
+        ctx.beginPath();
+        ctx.moveTo(fretX[0], stringY[i]);
+        ctx.lineTo(fretX[numFrets-1], stringY[i]);
+
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = "gray";
+
+        ctx.stroke();
+
+    }
+
+    // Display Frets
+    for (let i=0; i < numFrets; i++){
+
+        ctx.beginPath()
+        ctx.moveTo(fretX[i], stringY[0]);
+        ctx.lineTo(fretX[i], stringY[numStrings-1]);
+
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = "gray";
+
+        ctx.stroke();
+    }
+
+
 }
+
+
+
