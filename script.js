@@ -1,5 +1,29 @@
+// Intervals
+const unison = 0;
+const m2 = 1;
+const M2 = 2;
+const m3 = 3;
+const M3 = 4;
+const P4 = 5;
+const dim5 = 6;
+const P5 = 7;
+const m6 = 8;
+const M6 = 9;
+const m7 = 10;
+const M7 = 11;
+
+// Tunings
+const standard = ['E', 'A', 'D', 'G', 'B', 'E'];
+
+// Notes
+const notes = [['A','A'], ['A#','Bb'], ['B','B'],['C','C'], ['C#', 'Db'], ['D','D'], ['D#','Eb'], ['E','E'], ['F','F'], ['F#','Gb'],['G','G'],['G#','Ab']];
+
+// Build Fretboard
 const guitarStrings = 6;
 const frets = 12;
+
+// Default root
+root = noteIndex('C')
 
 const canvas = document.getElementById("fretboard");
 const ctx = canvas.getContext("2d");
@@ -7,18 +31,29 @@ const ctx = canvas.getContext("2d");
 const key = document.getElementById("key");
 const chord = document.getElementById("chords")
 
-const notes = [['A','A'], ['A#','Bb'], ['C','C'], ['C#', 'Db'], ['D','D'], ['D#','Eb'], ['E','E'], ['F','F'], ['F#','Gb'],['G','G'],['G#','Ab']];
+const [rawfretX, stringY, xdiv] = buildFretboard(guitarStrings, frets, 10);
 
-const startNote = notes[6];
+const fretX = rawfretX.map(x => x - xdiv/2);
 
-const [fretX, stringY, xdiv] = buildFretboard(guitarStrings, frets, 10);
+// Set Tuning
+let sixStr, fiveStr, fourStr, threeStr, twoStr, oneStr;
+setTuning(standard);
 
-populateFretboard(fretX,stringY,xdiv,notes);
+setNotePositions();
+
+// 
+setKey();
+
+//
+setChords();
+
+// Show the Notes
+showActiveNotes();
 
 function buildFretboard(numStrings, numFrets, margin){
 
     let stringY = [margin];
-    let fretX = [margin];
+    let rawfretX = [margin];
 
     let ydiv = (canvas.height-margin*2)/numStrings;
     for(let i=0; i < numStrings-1; i++){
@@ -28,16 +63,16 @@ function buildFretboard(numStrings, numFrets, margin){
 
     let xdiv = (canvas.width-margin*2)/numFrets;
     for(let i=0; i < numFrets-1; i++){
-        fretX.push(xdiv+fretX[i]);
+        rawfretX.push(xdiv+rawfretX[i]);
     }
-    console.log(fretX);
+    console.log(rawfretX);
 
     // Display Strings
     for(let i=0; i < numStrings; i++){
 
         ctx.beginPath();
-        ctx.moveTo(fretX[0], stringY[i]);
-        ctx.lineTo(fretX[numFrets-1], stringY[i]);
+        ctx.moveTo(rawfretX[0], stringY[i]);
+        ctx.lineTo(rawfretX[numFrets-1], stringY[i]);
 
         ctx.lineWidth = 5;
         ctx.strokeStyle = "gray";
@@ -50,8 +85,8 @@ function buildFretboard(numStrings, numFrets, margin){
     for (let i=0; i < numFrets; i++){
 
         ctx.beginPath()
-        ctx.moveTo(fretX[i], stringY[0]);
-        ctx.lineTo(fretX[i], stringY[numStrings-1]);
+        ctx.moveTo(rawfretX[i], stringY[0]);
+        ctx.lineTo(rawfretX[i], stringY[numStrings-1]);
 
         ctx.lineWidth = 5;
         ctx.strokeStyle = "gray";
@@ -59,26 +94,56 @@ function buildFretboard(numStrings, numFrets, margin){
         ctx.stroke();
     }
 
-    return [fretX, stringY, xdiv];
+    
+
+    return [rawfretX, stringY, xdiv];
 }
 
-function populateFretboard(fretX,stringY, xdiv, Notes, startNote){
-    
-    const shiftfretX = fretX.map(x => x - xdiv/2);
+function showActiveNotes(){
 
-    
-    for (let i=0; i<shiftfretX.length; i++){
+    for (let i=0; i<fretX.length; i++){
         for (let j=0; j<stringY.length; j++){
-            ctx.beginPath();
-            ctx.arc(shiftfretX[i], stringY[j], 10, 0, 2* Math.PI);
-            ctx.strokeStyle = "blue";
-            ctx.lineWidth = 4;
-            ctx.stroke();
-            ctx.fillStyle = "lightblue";
-            ctx.fill();
+            createNoteIcon(i,j,"blue","lightblue");
         }
     }
 
 }
 
+function createNoteIcon(fret,string,outline,infill){
+            ctx.beginPath();
+            ctx.arc(fretX[fret], stringY[string], 10, 0, 2* Math.PI);
+            ctx.strokeStyle = outline;
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            ctx.fillStyle = infill;
+            ctx.fill();
+}
 
+function noteIndex(letter) {
+    return notes.findIndex(pair => pair.includes(letter));
+}
+
+function setTuning(tuning) {
+    const sixStr = [noteIndex(tuning[0]), fretX[0], stringY[0]];
+    const fiveStr = [noteIndex(tuning[1]), fretX[0], stringY[1]];
+    const fourStr = [noteIndex(tuning[2]), fretX[0], stringY[2]];
+    const threeStr = [noteIndex(tuning[3]), fretX[0], stringY[3]];
+    const twoStr = [noteIndex(tuning[4]), fretX[0], stringY[4]];
+    const oneStr = [noteIndex(tuning[5]), fretX[0], stringY[5]];
+}
+
+function setKey(){
+    root = parseInt(key.value, 10);
+}
+
+function setChords(){
+
+}
+
+function setNotePositions(){
+    for(let i=0; i<length.stringY; i++){
+        for(let j = 0; j< length.fretX; j++){
+            
+        }
+    }  
+}
