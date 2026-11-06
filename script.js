@@ -23,7 +23,10 @@ const guitarStrings = 6;
 const frets = 12;
 
 // Default root
-root = noteIndex('C')
+root = noteIndex('C');
+
+// Object for named notes
+const notesByName = {};
 
 const canvas = document.getElementById("fretboard");
 const ctx = canvas.getContext("2d");
@@ -38,6 +41,22 @@ const fretX = rawfretX.map(x => x - xdiv/2);
 // Set Tuning
 let sixStr, fiveStr, fourStr, threeStr, twoStr, oneStr;
 setTuning(standard);
+
+notesByName['A'] = new Note(notes[0]);
+notesByName['A#'] = notesByName['Bb'] = new Note(notes[1]);
+notesByName['B'] = new Note(notes[2]);
+notesByName['C'] = new Note(notes[3]);
+notesByName['C#'] = notesByName['Db'] = new Note(notes[4]);
+notesByName['D'] = new Note(notes[5]);
+notesByName['D#'] = notesByName['Eb'] = new Note(notes[6]);
+notesByName['E'] = new Note(notes[7]);
+notesByName['F'] = new Note(notes[8]);
+notesByName['F#'] = notesByName['Gb'] = new Note(notes[9]);
+notesByName['G'] = new Note(notes[10]);
+notesByName['G#'] = notesByName['Ab'] = new Note(notes[11]);
+
+
+
 
 setNotePositions();
 
@@ -146,4 +165,13 @@ function setNotePositions(){
             
         }
     }  
+}
+
+class Note {
+
+    constructor(names){
+        this.sharpName = names[0];
+        this.flatName = names[1];
+
+    }
 }
