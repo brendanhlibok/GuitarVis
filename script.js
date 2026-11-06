@@ -151,7 +151,7 @@ function setChords(){
 function setNotePositions(){
     for(let i=0; i<length.stringY; i++){
         for(let j = 1; j<length.fretX; j++){
-            nextNote = notes[(notesByName[tuning[0]].relIndex+j) % 12]
+            nextNote = notes[(notesByName[tuning[i]].relIndex+j) % 12]
             nextNote.positions.push([fretX,stringY])
         }
     }  
