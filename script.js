@@ -16,7 +16,22 @@ const M7 = 11;
 const standard = ['E', 'A', 'D', 'G', 'B', 'E'];
 
 // Notes
-const notes = [['A','A'], ['A#','Bb'], ['B','B'],['C','C'], ['C#', 'Db'], ['D','D'], ['D#','Eb'], ['E','E'], ['F','F'], ['F#','Gb'],['G','G'],['G#','Ab']];
+const notes = [];
+const notesByName = {};
+
+notesByName['A'] = notes[0] = new Note(['A','A'], 0);
+notesByName['A#'] = notesByName['Bb'] = notes[1] = new Note(['A#','Bb'], 1);
+notesByName['B'] = notes[2] = new Note(['B','B'], 2);
+notesByName['C'] = notes[3] = new Note(['C','C'], 3);
+notesByName['C#'] = notesByName['Db'] = notes[4] = new Note(['C#', 'Db'], 4);
+notesByName['D'] = notes[5] = new Note(['D','D'], 5);
+notesByName['D#'] = notesByName['Eb'] = notes[6] = new Note(['D#','Eb'], 6);
+notesByName['E'] = notes[7] = new Note(['E','E'], 7);
+notesByName['F'] = notes[8] = new Note(['F','F'], 8);
+notesByName['F#'] = notesByName['Gb'] = notes[9] = new Note(['F#','Gb'], 9);
+notesByName['G'] = notes[10] = new Note(['G','G'], 10);
+notesByName['G#'] = notesByName['Ab'] = notes[11] = new Note(['G#','Ab'], 11);
+
 
 // Build Fretboard
 const guitarStrings = 6;
@@ -24,9 +39,6 @@ const frets = 12;
 
 // Default root
 root = noteIndex('C');
-
-// Object for named notes
-const notesByName = {};
 
 const canvas = document.getElementById("fretboard");
 const ctx = canvas.getContext("2d");
@@ -41,21 +53,6 @@ const fretX = rawfretX.map(x => x - xdiv/2);
 // Set Tuning
 let sixStr, fiveStr, fourStr, threeStr, twoStr, oneStr;
 setTuning(standard);
-
-notesByName['A'] = new Note(notes[0]);
-notesByName['A#'] = notesByName['Bb'] = new Note(notes[1]);
-notesByName['B'] = new Note(notes[2]);
-notesByName['C'] = new Note(notes[3]);
-notesByName['C#'] = notesByName['Db'] = new Note(notes[4]);
-notesByName['D'] = new Note(notes[5]);
-notesByName['D#'] = notesByName['Eb'] = new Note(notes[6]);
-notesByName['E'] = new Note(notes[7]);
-notesByName['F'] = new Note(notes[8]);
-notesByName['F#'] = notesByName['Gb'] = new Note(notes[9]);
-notesByName['G'] = new Note(notes[10]);
-notesByName['G#'] = notesByName['Ab'] = new Note(notes[11]);
-
-
 
 
 setNotePositions();
@@ -138,17 +135,9 @@ function createNoteIcon(fret,string,outline,infill){
             ctx.fill();
 }
 
-function noteIndex(letter) {
-    return notes.findIndex(pair => pair.includes(letter));
-}
-
 function setTuning(tuning) {
-    const sixStr = [noteIndex(tuning[0]), fretX[0], stringY[0]];
-    const fiveStr = [noteIndex(tuning[1]), fretX[0], stringY[1]];
-    const fourStr = [noteIndex(tuning[2]), fretX[0], stringY[2]];
-    const threeStr = [noteIndex(tuning[3]), fretX[0], stringY[3]];
-    const twoStr = [noteIndex(tuning[4]), fretX[0], stringY[4]];
-    const oneStr = [noteIndex(tuning[5]), fretX[0], stringY[5]];
+    const tuning = [[notesByName[tuning[0]], fretX[0], stringY[5]],[notesByName[tuning[1]], fretX[0], stringY[4]], [notesByName[tuning[2]], fretX[0], stringY[3]]
+                    [notesByName[tuning[3]], fretX[0], stringY[2]], [notesByName[tuning[4]], fretX[0], stringY[1]], [notesByName[tuning[5]], fretX[0], stringY[0]]];
 }
 
 function setKey(){
@@ -161,17 +150,23 @@ function setChords(){
 
 function setNotePositions(){
     for(let i=0; i<length.stringY; i++){
-        for(let j = 0; j< length.fretX; j++){
-            
+        for(let j = 1; j<length.fretX; j++){
+            nextNote = notes[(notesByName[tuning[0]].relIndex+j) % 12]
+            nextNote.positions.push([fretX,stringY])
         }
     }  
 }
 
 class Note {
 
-    constructor(names){
+    constructor(names, relIndex){
         this.sharpName = names[0];
         this.flatName = names[1];
+        this.relIndex = relIndex;
+        this.interval = null;
+        this.positions = [];
+        this.active = false;
+        this.aura = false;
 
     }
 }
