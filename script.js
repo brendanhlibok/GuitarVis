@@ -27,7 +27,7 @@ class Note {
         this.relIndex = relIndex;
         this.interval = null;
         this.positions = [];
-        this.active = true;
+        this.active = false;
         this.aura = false;
 
     }
@@ -65,9 +65,8 @@ const fretX = rawfretX.map(x => x - xdiv/2);
 
 setTuning(standard);
 
-console.log(notesByName['E'].positions[0]);
-
-setNotePositions();
+setNotePositions(standard);
+console.log(notesByName['E'].positions);
 
 showActiveNotes();
 
@@ -121,15 +120,6 @@ function buildFretboard(numStrings, numFrets, margin){
     return [rawfretX, stringY, xdiv];
 }
 
-function showActiveNotes(){
-    for (let i=0; i<notes.length; i++){
-        for (let j=0; j<notes[i].positions.length; j++){
-            createNoteIcon(notes[i].positions[j][0],notes[i].positions[j][1],"blue","lightblue");
-        }
-    }
-
-}
-
 function setTuning(tuningInput) {
     notesByName[tuningInput[0]].positions.push([fretX[0],stringY[5]]);
     notesByName[tuningInput[1]].positions.push([fretX[0],stringY[4]]);
@@ -140,12 +130,12 @@ function setTuning(tuningInput) {
 
 }
 
-function setNotePositions(tuning){
-    for(let i=0; i<length.stringY; i++){
-        for(let j = 1; j<length.fretX; j++){
-            nextNote = notes[(notesByName[tuning[i]].relIndex+j) % 12]
-            nextNote.positions.push([fretX[j],stringY[i]])
-            console.log([fretX[j],stringY[i]])
+function setNotePositions(tuningInput){
+    for(let i=0; i<stringY.length; i++){
+        for(let j = 1; j<fretX.length; j++){
+            nextNote = notes[(notesByName[tuningInput[i]].relIndex+j) % 12]
+            nextNote.positions.push([j,i])
+            nextNote.active = true;
         }
     }  
 }
@@ -157,7 +147,16 @@ function setKey(inputKey){
 function setChords(){
 }
 
-function createNoteIcon(fret,string,outline,infill){
+function showActiveNotes(){
+    for (let i=0; i<notes.length; i++){
+        for (let j=0; j<notes[i].positions.length; j++){
+            createNoteIcon(notes[i].sharpName, notes[i].positions[j][0],notes[i].positions[j][1],"blue","lightblue");
+        }
+    }
+
+}
+
+function createNoteIcon(name,fret,string,outline,infill){
             ctx.beginPath();
             ctx.arc(fretX[fret], stringY[string], 10, 0, 2* Math.PI);
             ctx.strokeStyle = outline;
@@ -165,4 +164,7 @@ function createNoteIcon(fret,string,outline,infill){
             ctx.stroke();
             ctx.fillStyle = infill;
             ctx.fill();
+            ctx.font = '24px sans-serif';
+            ctx.fillStyle = "#FF5733";
+            ctx.fillText(name, fretX[fret],stringY[string])
 }
