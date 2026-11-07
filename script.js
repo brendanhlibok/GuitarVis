@@ -54,12 +54,21 @@ const frets = 12;
 const canvas = document.getElementById("fretboard");
 const ctx = canvas.getContext("2d");
 
+const margin = 40
+
 const key = document.getElementById("key");
 const chord = document.getElementById("chords")
 
-const [rawfretX, stringY, xdiv] = buildFretboard(guitarStrings, frets, 10);
+const [rawfretX, stringY, xdiv] = buildFretboard(guitarStrings, frets, margin);
 
 const fretX = rawfretX.map(x => x - xdiv/2);
+
+// Set the note visuals
+const noteDia = xdiv/6;
+noteFontSize = noteDia
+const noteColor = "#FF3131"
+doubleNote = false;
+
 
 // Set Tuning
 
@@ -68,9 +77,11 @@ setTuning(standard);
 setNotePositions(standard);
 console.log(notesByName['E'].positions);
 
-showActiveNotes();
-
+// Set Key
+const keyType = 'ns';
 setKey();
+
+showActiveNotes();
 
 //
 setChords();
@@ -86,7 +97,7 @@ function buildFretboard(numStrings, numFrets, margin){
     }
     
     let xdiv = (canvas.width-margin*2)/numFrets;
-    for(let i=0; i < numFrets-1; i++){
+    for(let i=0; i < numFrets; i++){
         rawfretX.push(xdiv+rawfretX[i]);
     }
 
@@ -95,7 +106,7 @@ function buildFretboard(numStrings, numFrets, margin){
 
         ctx.beginPath();
         ctx.moveTo(rawfretX[0], stringY[i]);
-        ctx.lineTo(rawfretX[numFrets-1], stringY[i]);
+        ctx.lineTo(rawfretX[numFrets], stringY[i]);
 
         ctx.lineWidth = 5;
         ctx.strokeStyle = "gray";
@@ -105,7 +116,7 @@ function buildFretboard(numStrings, numFrets, margin){
     }
 
     // Display Frets
-    for (let i=0; i < numFrets; i++){
+    for (let i=0; i < numFrets+1; i++){
 
         ctx.beginPath()
         ctx.moveTo(rawfretX[i], stringY[0]);
@@ -149,22 +160,42 @@ function setChords(){
 
 function showActiveNotes(){
     for (let i=0; i<notes.length; i++){
+        if (keyType === 'ns'){
+            if (notes[i].sharpName === notes[i].flatName) {
+                name = notes[i].sharpName
+                doubleNote = false;
+            } else {
+                name = notes[i].sharpName + "/" + notes[i].flatName
+                doubleNote = true;
+            }
+        } else {
+            name = notes[i][keyType + "Name"];
+            doubleNote = false;
+        }
         for (let j=0; j<notes[i].positions.length; j++){
-            createNoteIcon(notes[i].sharpName, notes[i].positions[j][0],notes[i].positions[j][1],"blue","lightblue");
+            createNoteIcon(name, notes[i].positions[j][0],notes[i].positions[j][1],"blue","lightblue");
         }
     }
 
 }
 
 function createNoteIcon(name,fret,string,outline,infill){
-            ctx.beginPath();
-            ctx.arc(fretX[fret], stringY[string], 10, 0, 2* Math.PI);
-            ctx.strokeStyle = outline;
-            ctx.lineWidth = 4;
-            ctx.stroke();
-            ctx.fillStyle = infill;
-            ctx.fill();
-            ctx.font = '24px sans-serif';
-            ctx.fillStyle = "#FF5733";
-            ctx.fillText(name, fretX[fret],stringY[string])
+    if (doubleNote){
+        noteFontSize = noteDia/2;
+    } else {
+        noteFontSize = noteDia;
+    }
+    ctx.beginPath();
+    ctx.arc(fretX[fret], stringY[string], noteDia, 0, 2* Math.PI);
+    ctx.strokeStyle = outline;
+    ctx.lineWidth = 4;
+    ctx.stroke();
+    ctx.fillStyle = infill;
+    ctx.fill();
+    noteFont = `${noteFontSize}px sans-serif`;
+    ctx.font = noteFont;
+    ctx.fillStyle = noteColor;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(name, fretX[fret],stringY[string])
 }

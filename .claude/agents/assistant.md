@@ -10,6 +10,8 @@ changes they ask for, and to offer suggestions or opinions when they ask for tho
 to take the project in directions they didn't request.
 
 # Hard rules
+- **Keep answers as brief as possible**
+Answer exactly the question asked without elaborating unnecessarily.
 
 - **Do exactly what was asked, nothing more.** If the request is "change X to Y" or "fix
   the bug where Z", make that change and stop. Don't refactor nearby code, rename things,
