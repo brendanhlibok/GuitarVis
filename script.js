@@ -19,6 +19,9 @@ const standard = ['E', 'A', 'D', 'G', 'B', 'E'];
 const notes = [];
 const notesByName = {};
 
+// Scales
+const major = [root,M2,M3,P4,P5,M6,M7];
+
 class Note {
 
     constructor(names, relIndex){
@@ -29,6 +32,10 @@ class Note {
         this.positions = [];
         this.active = false;
         this.aura = false;
+        this.color = "#FF3131";
+        this.outline = 'blue';
+        this.infill = 'lightblue';
+
 
     }
 }
@@ -46,6 +53,7 @@ notesByName['F#'] = notesByName['Gb'] = notes[9] = new Note(['F#','Gb'], 9);
 notesByName['G'] = notes[10] = new Note(['G','G'], 10);
 notesByName['G#'] = notesByName['Ab'] = notes[11] = new Note(['G#','Ab'], 11);
 
+let rootNote;
 
 // Build Fretboard
 const guitarStrings = 6;
@@ -65,9 +73,10 @@ const fretX = rawfretX.map(x => x - xdiv/2);
 
 // Set the note visuals
 const noteDia = xdiv/6;
-noteFontSize = noteDia
-const noteColor = "#FF3131"
+noteFontSize = noteDia;
 doubleNote = false;
+
+const noteColor = "#FF3131"
 
 
 // Set Tuning
@@ -75,11 +84,13 @@ doubleNote = false;
 setTuning(standard);
 
 setNotePositions(standard);
-console.log(notesByName['E'].positions);
 
-// Set Key
-const keyType = 'ns';
-setKey();
+keyType = 'ns';
+
+showActiveNotes();
+
+setKey('A');
+setScale(major);
 
 showActiveNotes();
 
@@ -95,6 +106,8 @@ function buildFretboard(numStrings, numFrets, margin){
     for(let i=0; i < numStrings-1; i++){
         stringY.push(ydiv+stringY[i]);
     }
+
+    stringY.reverse();
     
     let xdiv = (canvas.width-margin*2)/numFrets;
     for(let i=0; i < numFrets; i++){
@@ -152,13 +165,27 @@ function setNotePositions(tuningInput){
 }
 
 function setKey(inputKey){
+    rootNote = notesByName[inputKey];
+    rootNote.interval = root;
+    for(let i=1; i<notes.length; i++){
+        notes[(rootNote.relIndex+i) % 12].interval = i;
+    }
+}
 
+function setScale(inputScale){
+    for (let i=0; i<notes.length; i++){
+        let interval = (notes[i].relIndex - rootNote.relIndex + 12) % 12;
+        notes[i].active = inputScale.includes(interval);
+    } 
 }
 
 function setChords(){
 }
 
 function showActiveNotes(){
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    buildFretboard(guitarStrings, frets, margin);
+
     for (let i=0; i<notes.length; i++){
         if (keyType === 'ns'){
             if (notes[i].sharpName === notes[i].flatName) {
@@ -173,13 +200,15 @@ function showActiveNotes(){
             doubleNote = false;
         }
         for (let j=0; j<notes[i].positions.length; j++){
-            createNoteIcon(name, notes[i].positions[j][0],notes[i].positions[j][1],"blue","lightblue");
-        }
-    }
+            if (notes[i].active){
+                createNoteIcon(name, notes[i].positions[j][0],notes[i].positions[j][1],notes[i]);
+            }
+        }   
 
+    }
 }
 
-function createNoteIcon(name,fret,string,outline,infill){
+function createNoteIcon(name,fret,string,note){
     if (doubleNote){
         noteFontSize = noteDia/2;
     } else {
@@ -187,15 +216,15 @@ function createNoteIcon(name,fret,string,outline,infill){
     }
     ctx.beginPath();
     ctx.arc(fretX[fret], stringY[string], noteDia, 0, 2* Math.PI);
-    ctx.strokeStyle = outline;
+    ctx.strokeStyle = note.outline;
     ctx.lineWidth = 4;
     ctx.stroke();
-    ctx.fillStyle = infill;
+    ctx.fillStyle = note.infill;
     ctx.fill();
     noteFont = `${noteFontSize}px sans-serif`;
     ctx.font = noteFont;
-    ctx.fillStyle = noteColor;
+    ctx.fillStyle = note.color;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText(name, fretX[fret],stringY[string])
+    ctx.fillText(name, fretX[fret],stringY[string]);
 }
