@@ -12,6 +12,21 @@ const M6 = 9;
 const m7 = 10;
 const M7 = 11;
 
+intervalColors = {
+    [root]: "#0a0000",
+    [m2]: "#3d9477",
+    [M2]: "#3d9477",
+    [m3]: "#3d9477",
+    [M3]: "#3d9477",
+    [P4]: "#3d9477",
+    [dim5]: "#3d9477",
+    [P5]: "#3d9477",
+    [m6]: "#3d9477",
+    [M6]: "#3d9477",
+    [m7]: "#3d9477",
+    [M7]: "#3d9477",
+}
+
 // Tunings
 const standard = ['E', 'A', 'D', 'G', 'B', 'E'];
 
@@ -32,10 +47,11 @@ class Note {
         this.positions = [];
         this.active = false;
         this.aura = false;
-        this.color = "#FF3131";
-        this.outline = 'blue';
-        this.infill = 'lightblue';
+        this.color = "#f7f4f4";
+        this.outline = "#3d9477";
+        this.infill = "#bd6f45";
 
+    
 
     }
 }
@@ -60,11 +76,11 @@ const guitarStrings = 6;
 const frets = 12;
 
 const canvas = document.getElementById("fretboard");
+const keyselector = document.querySelector('#key');
 const ctx = canvas.getContext("2d");
 
 const margin = 40
 
-const key = document.getElementById("key");
 const chord = document.getElementById("chords")
 
 const [rawfretX, stringY, xdiv] = buildFretboard(guitarStrings, frets, margin);
@@ -85,12 +101,23 @@ setTuning(standard);
 
 setNotePositions(standard);
 
-keyType = 'ns';
+let keyType = 'ns';
+let key = 'A';
+
+setKey('A');
+
+let scale = major;
+
+setScale(scale);
 
 showActiveNotes();
 
-setKey('A');
-setScale(major);
+keyselector.addEventListener('change', e =>{
+    key = keyselector.value;
+    setKey(key);
+    setScale(scale);
+    showActiveNotes();
+});
 
 showActiveNotes();
 
@@ -166,16 +193,21 @@ function setNotePositions(tuningInput){
 
 function setKey(inputKey){
     rootNote = notesByName[inputKey];
+    console.log(rootNote.sharpName);
     rootNote.interval = root;
+    rootNote.infill = intervalColors[root];
     for(let i=1; i<notes.length; i++){
         notes[(rootNote.relIndex+i) % 12].interval = i;
+        notes[(rootNote.relIndex+i) % 12].infill = intervalColors[i];
     }
 }
 
 function setScale(inputScale){
+    console.log(rootNote.sharpName);
     for (let i=0; i<notes.length; i++){
         let interval = (notes[i].relIndex - rootNote.relIndex + 12) % 12;
         notes[i].active = inputScale.includes(interval);
+        console.log(notes[i].active);
     } 
 }
 
