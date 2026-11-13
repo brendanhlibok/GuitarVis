@@ -39,10 +39,11 @@ const major = [root,M2,M3,P4,P5,M6,M7];
 
 class Note {
 
-    constructor(names, relIndex){
+    constructor(names, relIndex, type){
         this.sharpName = names[0];
         this.flatName = names[1];
         this.relIndex = relIndex;
+        this.keyType = type;
         this.interval = null;
         this.positions = [];
         this.active = false;
@@ -50,30 +51,37 @@ class Note {
         this.color = "#f7f4f4";
         this.outline = "#3d9477";
         this.infill = "#bd6f45";
-
-    
+  
 
     }
 }
 
-notesByName['A'] = notes[0] = new Note(['A','A'], 0);
-notesByName['A#'] = notesByName['Bb'] = notes[1] = new Note(['A#','Bb'], 1);
-notesByName['B'] = notes[2] = new Note(['B','B'], 2);
-notesByName['C'] = notes[3] = new Note(['C','C'], 3);
-notesByName['C#'] = notesByName['Db'] = notes[4] = new Note(['C#', 'Db'], 4);
-notesByName['D'] = notes[5] = new Note(['D','D'], 5);
-notesByName['D#'] = notesByName['Eb'] = notes[6] = new Note(['D#','Eb'], 6);
-notesByName['E'] = notes[7] = new Note(['E','E'], 7);
-notesByName['F'] = notes[8] = new Note(['F','F'], 8);
-notesByName['F#'] = notesByName['Gb'] = notes[9] = new Note(['F#','Gb'], 9);
-notesByName['G'] = notes[10] = new Note(['G','G'], 10);
-notesByName['G#'] = notesByName['Ab'] = notes[11] = new Note(['G#','Ab'], 11);
+notesByName['A'] = notes[0] = new Note(['A','A'], 0, 'sharp');
+notesByName['A#'] = notesByName['Bb'] = notes[1] = new Note(['A#','Bb'], 1, 'flat');
+notesByName['B'] = notes[2] = new Note(['B','B'], 2, 'sharp');
+notesByName['C'] = notes[3] = new Note(['C','C'], 3, 'ns');
+notesByName['C#'] = notesByName['Db'] = notes[4] = new Note(['C#', 'Db'], 4, 'flat');
+notesByName['D'] = notes[5] = new Note(['D','D'], 5, 'sharp');
+notesByName['D#'] = notesByName['Eb'] = notes[6] = new Note(['D#','Eb'], 6, 'flat');
+notesByName['E'] = notes[7] = new Note(['E','E'], 7, 'sharp');
+notesByName['F'] = notes[8] = new Note(['F','F'], 8, 'flat');
+notesByName['F#'] = notesByName['Gb'] = notes[9] = new Note(['F#','Gb'], 9, 'ns');
+notesByName['G'] = notes[10] = new Note(['G','G'], 10, 'sharp');
+notesByName['G#'] = notesByName['Ab'] = notes[11] = new Note(['G#','Ab'], 11,'flat');
 
-let rootNote;
+
 
 // Build Fretboard
 const guitarStrings = 6;
 const frets = 12;
+
+// Key
+let rootNote;
+let keyType = 'ns';
+let key = 'A';
+
+// Scale
+let scale = major;
 
 const canvas = document.getElementById("fretboard");
 const keyselector = document.querySelector('#key');
@@ -94,19 +102,15 @@ doubleNote = false;
 
 const noteColor = "#FF3131"
 
-
 // Set Tuning
 
 setTuning(standard);
 
 setNotePositions(standard);
 
-let keyType = 'ns';
-let key = 'A';
 
-setKey('A');
 
-let scale = major;
+setKey(keyselector.value);
 
 setScale(scale);
 
@@ -193,7 +197,8 @@ function setNotePositions(tuningInput){
 
 function setKey(inputKey){
     rootNote = notesByName[inputKey];
-    console.log(rootNote.sharpName);
+    keyType = rootNote.keyType;
+    console.log(keyType);
     rootNote.interval = root;
     rootNote.infill = intervalColors[root];
     for(let i=1; i<notes.length; i++){
@@ -207,7 +212,6 @@ function setScale(inputScale){
     for (let i=0; i<notes.length; i++){
         let interval = (notes[i].relIndex - rootNote.relIndex + 12) % 12;
         notes[i].active = inputScale.includes(interval);
-        console.log(notes[i].active);
     } 
 }
 
